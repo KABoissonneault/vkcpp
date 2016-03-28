@@ -1621,11 +1621,7 @@ void writeCall(std::ofstream & ofs, std::string const& name, size_t templateInde
             ofs << reduceName(commandData.arguments[it->first].name);
             if (commandData.arguments[it->first].optional)
             {
-              ofs << " ? " << reduceName(commandData.arguments[it->first].name) << "->c_str() : nullptr";
-            }
-            else
-            {
-              ofs << ".c_str()";
+              ofs << " ? *" << reduceName(commandData.arguments[it->first].name) << " : nullptr";
             }
           }
           else
@@ -1672,11 +1668,7 @@ void writeCall(std::ofstream & ofs, std::string const& name, size_t templateInde
             ofs << reduceName(commandData.arguments[i].name);
             if (commandData.arguments[i].optional)
             {
-              ofs << " ? " << reduceName(commandData.arguments[i].name) << "->c_str() : nullptr";
-            }
-            else
-            {
-              ofs << ".c_str()";
+              ofs << " ? *" << reduceName(commandData.arguments[i].name) << " : nullptr";
             }
           }
           else
@@ -1930,7 +1922,7 @@ void writeFunctionHeader(std::ofstream & ofs, std::string const& indentation, st
           assert(pos != std::string::npos);
           if (commandData.arguments[i].type.find("char") != std::string::npos)
           {
-            ofs << "std::string const";
+            ofs << "gsl::czstring<> const";
           }
           else
           {
@@ -1942,19 +1934,42 @@ void writeFunctionHeader(std::ofstream & ofs, std::string const& indentation, st
         {
           if (templateIndex == i)
           {
-            ofs << "std::vector<T>";
+			  ofs << "gsl::span<T";
+			  if (commandData.arguments[i].type.find("const") != std::string::npos)
+			  {
+				  ofs << " const";
+			  }
+			  ofs << ">";
           }
           else if (commandData.arguments[i].pureType == "char")
           {
-            ofs << "std::string";
+			  if (commandData.arguments[i].type.find("const") != std::string::npos)
+			  {
+				  ofs << "gsl::czstring<>";
+			  }
+			  else
+			  {
+				  ofs << "gsl::zstring<>";
+			  }
+            
           }
           else if (commandData.arguments[i].pureType == "void")
           {
-            ofs << "std::vector<uint8_t>";
+			ofs << "gsl::span<uint8_t";
+			if (commandData.arguments[i].type.find("const") != std::string::npos)
+			{
+				ofs << " const";
+			}
+			ofs <<">";
           }
           else
           {
-            ofs << "std::vector<" << commandData.arguments[i].pureType << ">";
+			ofs << "gsl::span<" << commandData.arguments[i].pureType;
+			if (commandData.arguments[i].type.find("const") != std::string::npos)
+			{
+				ofs << " const";
+			}
+			ofs << ">";
           }
           if (commandData.arguments[i].type.find("const") != std::string::npos)
           {
@@ -2772,7 +2787,8 @@ int main( int argc, char **argv )
       << "#include <system_error>" << std::endl
       << "#include <vulkan/vulkan.h>" << std::endl
       << "#ifdef VKCPP_ENHANCED_MODE" << std::endl
-      << "# include <vector>" << std::endl
+      << "#include <gsl.h>" << std::endl
+	  << "#include <vector>" << std::endl
       << "#endif /*VKCPP_ENHANCED_MODE*/" << std::endl
       << std::endl;
 
