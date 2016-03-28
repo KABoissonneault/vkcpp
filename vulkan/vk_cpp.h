@@ -60,7 +60,8 @@
 #include <system_error>
 #include <vulkan/vulkan.h>
 #ifdef VKCPP_ENHANCED_MODE
-# include <vector>
+#include <gsl.h>
+#include <vector>
 #endif /*VKCPP_ENHANCED_MODE*/
 
 static_assert( VK_MAKE_VERSION(1, 0, 5) == VK_API_VERSION, "Wrong VK_API_VERSION!" );
@@ -17650,7 +17651,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void setViewport( uint32_t firstViewport, std::vector<Viewport> const & viewports ) const
+    void setViewport( uint32_t firstViewport, gsl::span<Viewport const> const & viewports ) const
     {
       vkCmdSetViewport( m_commandBuffer, firstViewport, static_cast<uint32_t>( viewports.size() ), reinterpret_cast<const VkViewport*>( viewports.data() ) );
     }
@@ -17662,7 +17663,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void setScissor( uint32_t firstScissor, std::vector<Rect2D> const & scissors ) const
+    void setScissor( uint32_t firstScissor, gsl::span<Rect2D const> const & scissors ) const
     {
       vkCmdSetScissor( m_commandBuffer, firstScissor, static_cast<uint32_t>( scissors.size() ), reinterpret_cast<const VkRect2D*>( scissors.data() ) );
     }
@@ -17772,7 +17773,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void bindDescriptorSets( PipelineBindPoint pipelineBindPoint, PipelineLayout layout, uint32_t firstSet, std::vector<DescriptorSet> const & descriptorSets, std::vector<uint32_t> const & dynamicOffsets ) const
+    void bindDescriptorSets( PipelineBindPoint pipelineBindPoint, PipelineLayout layout, uint32_t firstSet, gsl::span<DescriptorSet const> const & descriptorSets, gsl::span<uint32_t const> const & dynamicOffsets ) const
     {
       vkCmdBindDescriptorSets( m_commandBuffer, static_cast<VkPipelineBindPoint>( pipelineBindPoint ), static_cast<VkPipelineLayout>( layout ), firstSet, static_cast<uint32_t>( descriptorSets.size() ), reinterpret_cast<const VkDescriptorSet*>( descriptorSets.data() ), static_cast<uint32_t>( dynamicOffsets.size() ), dynamicOffsets.data() );
     }
@@ -17798,7 +17799,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void bindVertexBuffers( uint32_t firstBinding, std::vector<Buffer> const & buffers, std::vector<DeviceSize> const & offsets ) const
+    void bindVertexBuffers( uint32_t firstBinding, gsl::span<Buffer const> const & buffers, gsl::span<DeviceSize const> const & offsets ) const
     {
       if ( buffers.size() != offsets.size() )
       {
@@ -17898,7 +17899,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void copyBuffer( Buffer srcBuffer, Buffer dstBuffer, std::vector<BufferCopy> const & regions ) const
+    void copyBuffer( Buffer srcBuffer, Buffer dstBuffer, gsl::span<BufferCopy const> const & regions ) const
     {
       vkCmdCopyBuffer( m_commandBuffer, static_cast<VkBuffer>( srcBuffer ), static_cast<VkBuffer>( dstBuffer ), static_cast<uint32_t>( regions.size() ), reinterpret_cast<const VkBufferCopy*>( regions.data() ) );
     }
@@ -17910,7 +17911,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void copyImage( Image srcImage, ImageLayout srcImageLayout, Image dstImage, ImageLayout dstImageLayout, std::vector<ImageCopy> const & regions ) const
+    void copyImage( Image srcImage, ImageLayout srcImageLayout, Image dstImage, ImageLayout dstImageLayout, gsl::span<ImageCopy const> const & regions ) const
     {
       vkCmdCopyImage( m_commandBuffer, static_cast<VkImage>( srcImage ), static_cast<VkImageLayout>( srcImageLayout ), static_cast<VkImage>( dstImage ), static_cast<VkImageLayout>( dstImageLayout ), static_cast<uint32_t>( regions.size() ), reinterpret_cast<const VkImageCopy*>( regions.data() ) );
     }
@@ -17922,7 +17923,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void blitImage( Image srcImage, ImageLayout srcImageLayout, Image dstImage, ImageLayout dstImageLayout, std::vector<ImageBlit> const & regions, Filter filter ) const
+    void blitImage( Image srcImage, ImageLayout srcImageLayout, Image dstImage, ImageLayout dstImageLayout, gsl::span<ImageBlit const> const & regions, Filter filter ) const
     {
       vkCmdBlitImage( m_commandBuffer, static_cast<VkImage>( srcImage ), static_cast<VkImageLayout>( srcImageLayout ), static_cast<VkImage>( dstImage ), static_cast<VkImageLayout>( dstImageLayout ), static_cast<uint32_t>( regions.size() ), reinterpret_cast<const VkImageBlit*>( regions.data() ), static_cast<VkFilter>( filter ) );
     }
@@ -17934,7 +17935,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void copyBufferToImage( Buffer srcBuffer, Image dstImage, ImageLayout dstImageLayout, std::vector<BufferImageCopy> const & regions ) const
+    void copyBufferToImage( Buffer srcBuffer, Image dstImage, ImageLayout dstImageLayout, gsl::span<BufferImageCopy const> const & regions ) const
     {
       vkCmdCopyBufferToImage( m_commandBuffer, static_cast<VkBuffer>( srcBuffer ), static_cast<VkImage>( dstImage ), static_cast<VkImageLayout>( dstImageLayout ), static_cast<uint32_t>( regions.size() ), reinterpret_cast<const VkBufferImageCopy*>( regions.data() ) );
     }
@@ -17946,7 +17947,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void copyImageToBuffer( Image srcImage, ImageLayout srcImageLayout, Buffer dstBuffer, std::vector<BufferImageCopy> const & regions ) const
+    void copyImageToBuffer( Image srcImage, ImageLayout srcImageLayout, Buffer dstBuffer, gsl::span<BufferImageCopy const> const & regions ) const
     {
       vkCmdCopyImageToBuffer( m_commandBuffer, static_cast<VkImage>( srcImage ), static_cast<VkImageLayout>( srcImageLayout ), static_cast<VkBuffer>( dstBuffer ), static_cast<uint32_t>( regions.size() ), reinterpret_cast<const VkBufferImageCopy*>( regions.data() ) );
     }
@@ -17959,7 +17960,7 @@ namespace vk
 
 #ifdef VKCPP_ENHANCED_MODE
     template <typename T>
-    void updateBuffer( Buffer dstBuffer, DeviceSize dstOffset, std::vector<T> const & data ) const
+    void updateBuffer( Buffer dstBuffer, DeviceSize dstOffset, gsl::span<T const> const & data ) const
     {
       static_assert( sizeof( T ) % sizeof( uint32_t ) == 0, "wrong size of template type T" );
       vkCmdUpdateBuffer( m_commandBuffer, static_cast<VkBuffer>( dstBuffer ), dstOffset, static_cast<DeviceSize>( data.size() * sizeof( T ) ), reinterpret_cast<const uint32_t*>( data.data() ) );
@@ -17986,7 +17987,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void clearColorImage( Image image, ImageLayout imageLayout, const ClearColorValue & color, std::vector<ImageSubresourceRange> const & ranges ) const
+    void clearColorImage( Image image, ImageLayout imageLayout, const ClearColorValue & color, gsl::span<ImageSubresourceRange const> const & ranges ) const
     {
       vkCmdClearColorImage( m_commandBuffer, static_cast<VkImage>( image ), static_cast<VkImageLayout>( imageLayout ), reinterpret_cast<const VkClearColorValue*>( &color ), static_cast<uint32_t>( ranges.size() ), reinterpret_cast<const VkImageSubresourceRange*>( ranges.data() ) );
     }
@@ -17998,7 +17999,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void clearDepthStencilImage( Image image, ImageLayout imageLayout, const ClearDepthStencilValue & depthStencil, std::vector<ImageSubresourceRange> const & ranges ) const
+    void clearDepthStencilImage( Image image, ImageLayout imageLayout, const ClearDepthStencilValue & depthStencil, gsl::span<ImageSubresourceRange const> const & ranges ) const
     {
       vkCmdClearDepthStencilImage( m_commandBuffer, static_cast<VkImage>( image ), static_cast<VkImageLayout>( imageLayout ), reinterpret_cast<const VkClearDepthStencilValue*>( &depthStencil ), static_cast<uint32_t>( ranges.size() ), reinterpret_cast<const VkImageSubresourceRange*>( ranges.data() ) );
     }
@@ -18010,7 +18011,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void clearAttachments( std::vector<ClearAttachment> const & attachments, std::vector<ClearRect> const & rects ) const
+    void clearAttachments( gsl::span<ClearAttachment const> const & attachments, gsl::span<ClearRect const> const & rects ) const
     {
       vkCmdClearAttachments( m_commandBuffer, static_cast<uint32_t>( attachments.size() ), reinterpret_cast<const VkClearAttachment*>( attachments.data() ), static_cast<uint32_t>( rects.size() ), reinterpret_cast<const VkClearRect*>( rects.data() ) );
     }
@@ -18022,7 +18023,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void resolveImage( Image srcImage, ImageLayout srcImageLayout, Image dstImage, ImageLayout dstImageLayout, std::vector<ImageResolve> const & regions ) const
+    void resolveImage( Image srcImage, ImageLayout srcImageLayout, Image dstImage, ImageLayout dstImageLayout, gsl::span<ImageResolve const> const & regions ) const
     {
       vkCmdResolveImage( m_commandBuffer, static_cast<VkImage>( srcImage ), static_cast<VkImageLayout>( srcImageLayout ), static_cast<VkImage>( dstImage ), static_cast<VkImageLayout>( dstImageLayout ), static_cast<uint32_t>( regions.size() ), reinterpret_cast<const VkImageResolve*>( regions.data() ) );
     }
@@ -18062,7 +18063,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void waitEvents( std::vector<Event> const & events, PipelineStageFlags srcStageMask, PipelineStageFlags dstStageMask, std::vector<MemoryBarrier> const & memoryBarriers, std::vector<BufferMemoryBarrier> const & bufferMemoryBarriers, std::vector<ImageMemoryBarrier> const & imageMemoryBarriers ) const
+    void waitEvents( gsl::span<Event const> const & events, PipelineStageFlags srcStageMask, PipelineStageFlags dstStageMask, gsl::span<MemoryBarrier const> const & memoryBarriers, gsl::span<BufferMemoryBarrier const> const & bufferMemoryBarriers, gsl::span<ImageMemoryBarrier const> const & imageMemoryBarriers ) const
     {
       vkCmdWaitEvents( m_commandBuffer, static_cast<uint32_t>( events.size() ), reinterpret_cast<const VkEvent*>( events.data() ), static_cast<VkPipelineStageFlags>( srcStageMask ), static_cast<VkPipelineStageFlags>( dstStageMask ), static_cast<uint32_t>( memoryBarriers.size() ), reinterpret_cast<const VkMemoryBarrier*>( memoryBarriers.data() ), static_cast<uint32_t>( bufferMemoryBarriers.size() ), reinterpret_cast<const VkBufferMemoryBarrier*>( bufferMemoryBarriers.data() ), static_cast<uint32_t>( imageMemoryBarriers.size() ), reinterpret_cast<const VkImageMemoryBarrier*>( imageMemoryBarriers.data() ) );
     }
@@ -18074,7 +18075,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void pipelineBarrier( PipelineStageFlags srcStageMask, PipelineStageFlags dstStageMask, DependencyFlags dependencyFlags, std::vector<MemoryBarrier> const & memoryBarriers, std::vector<BufferMemoryBarrier> const & bufferMemoryBarriers, std::vector<ImageMemoryBarrier> const & imageMemoryBarriers ) const
+    void pipelineBarrier( PipelineStageFlags srcStageMask, PipelineStageFlags dstStageMask, DependencyFlags dependencyFlags, gsl::span<MemoryBarrier const> const & memoryBarriers, gsl::span<BufferMemoryBarrier const> const & bufferMemoryBarriers, gsl::span<ImageMemoryBarrier const> const & imageMemoryBarriers ) const
     {
       vkCmdPipelineBarrier( m_commandBuffer, static_cast<VkPipelineStageFlags>( srcStageMask ), static_cast<VkPipelineStageFlags>( dstStageMask ), static_cast<VkDependencyFlags>( dependencyFlags ), static_cast<uint32_t>( memoryBarriers.size() ), reinterpret_cast<const VkMemoryBarrier*>( memoryBarriers.data() ), static_cast<uint32_t>( bufferMemoryBarriers.size() ), reinterpret_cast<const VkBufferMemoryBarrier*>( bufferMemoryBarriers.data() ), static_cast<uint32_t>( imageMemoryBarriers.size() ), reinterpret_cast<const VkImageMemoryBarrier*>( imageMemoryBarriers.data() ) );
     }
@@ -18156,7 +18157,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void pushConstants( PipelineLayout layout, ShaderStageFlags stageFlags, uint32_t offset, std::vector<uint8_t> const & values ) const
+    void pushConstants( PipelineLayout layout, ShaderStageFlags stageFlags, uint32_t offset, gsl::span<uint8_t const> const & values ) const
     {
       vkCmdPushConstants( m_commandBuffer, static_cast<VkPipelineLayout>( layout ), static_cast<VkShaderStageFlags>( stageFlags ), offset, static_cast<uint32_t>( values.size() ), values.data() );
     }
@@ -18208,7 +18209,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void executeCommands( std::vector<CommandBuffer> const & commandBuffers ) const
+    void executeCommands( gsl::span<CommandBuffer const> const & commandBuffers ) const
     {
       vkCmdExecuteCommands( m_commandBuffer, static_cast<uint32_t>( commandBuffers.size() ), reinterpret_cast<const VkCommandBuffer*>( commandBuffers.data() ) );
     }
@@ -18783,7 +18784,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void submit( std::vector<SubmitInfo> const & submits, Fence fence ) const
+    void submit( gsl::span<SubmitInfo const> const & submits, Fence fence ) const
     {
       Result result = static_cast<Result>( vkQueueSubmit( m_queue, static_cast<uint32_t>( submits.size() ), reinterpret_cast<const VkSubmitInfo*>( submits.data() ), static_cast<VkFence>( fence ) ) );
       if ( result != Result::eSuccess )
@@ -18817,7 +18818,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void bindSparse( std::vector<BindSparseInfo> const & bindInfo, Fence fence ) const
+    void bindSparse( gsl::span<BindSparseInfo const> const & bindInfo, Fence fence ) const
     {
       Result result = static_cast<Result>( vkQueueBindSparse( m_queue, static_cast<uint32_t>( bindInfo.size() ), reinterpret_cast<const VkBindSparseInfo*>( bindInfo.data() ), static_cast<VkFence>( fence ) ) );
       if ( result != Result::eSuccess )
@@ -20099,9 +20100,9 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    PFN_vkVoidFunction getProcAddr( std::string const & name ) const
+    PFN_vkVoidFunction getProcAddr( gsl::czstring<> const & name ) const
     {
-      return vkGetDeviceProcAddr( m_device, name.c_str() );
+      return vkGetDeviceProcAddr( m_device, name );
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -20219,7 +20220,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void flushMappedMemoryRanges( std::vector<MappedMemoryRange> const & memoryRanges ) const
+    void flushMappedMemoryRanges( gsl::span<MappedMemoryRange const> const & memoryRanges ) const
     {
       Result result = static_cast<Result>( vkFlushMappedMemoryRanges( m_device, static_cast<uint32_t>( memoryRanges.size() ), reinterpret_cast<const VkMappedMemoryRange*>( memoryRanges.data() ) ) );
       if ( result != Result::eSuccess )
@@ -20235,7 +20236,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void invalidateMappedMemoryRanges( std::vector<MappedMemoryRange> const & memoryRanges ) const
+    void invalidateMappedMemoryRanges( gsl::span<MappedMemoryRange const> const & memoryRanges ) const
     {
       Result result = static_cast<Result>( vkInvalidateMappedMemoryRanges( m_device, static_cast<uint32_t>( memoryRanges.size() ), reinterpret_cast<const VkMappedMemoryRange*>( memoryRanges.data() ) ) );
       if ( result != Result::eSuccess )
@@ -20334,8 +20335,8 @@ namespace vk
       std::vector<SparseImageMemoryRequirements> sparseMemoryRequirements;
       uint32_t sparseMemoryRequirementCount;
       vkGetImageSparseMemoryRequirements( m_device, static_cast<VkImage>( image ), &sparseMemoryRequirementCount, nullptr );
-      sparseMemoryRequirements.resize( sparseMemoryRequirementCount );
-      vkGetImageSparseMemoryRequirements( m_device, static_cast<VkImage>( image ), &sparseMemoryRequirementCount, reinterpret_cast<VkSparseImageMemoryRequirements*>( sparseMemoryRequirements.data() ) );
+      std::vector<SparseImageMemoryRequirements> ret(sparseMemoryRequirementCount);
+      vkGetImageSparseMemoryRequirements( m_device, static_cast<VkImage>( image ), &sparseMemoryRequirementCount, reinterpret_cast<VkSparseImageMemoryRequirements*>( ret.data() ) );
       return sparseMemoryRequirements;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
@@ -20376,7 +20377,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void resetFences( std::vector<Fence> const & fences ) const
+    void resetFences( gsl::span<Fence const> const & fences ) const
     {
       Result result = static_cast<Result>( vkResetFences( m_device, static_cast<uint32_t>( fences.size() ), reinterpret_cast<const VkFence*>( fences.data() ) ) );
       if ( result != Result::eSuccess )
@@ -20411,7 +20412,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result waitForFences( std::vector<Fence> const & fences, Bool32 waitAll, uint64_t timeout ) const
+    Result waitForFences( gsl::span<Fence const> const & fences, Bool32 waitAll, uint64_t timeout ) const
     {
       Result result = static_cast<Result>( vkWaitForFences( m_device, static_cast<uint32_t>( fences.size() ), reinterpret_cast<const VkFence*>( fences.data() ), waitAll, timeout ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eTimeout ) )
@@ -20574,7 +20575,7 @@ namespace vk
 
 #ifdef VKCPP_ENHANCED_MODE
     template <typename T>
-    Result getQueryPoolResults( QueryPool queryPool, uint32_t firstQuery, uint32_t queryCount, std::vector<T> & data, DeviceSize stride, QueryResultFlags flags ) const
+    Result getQueryPoolResults( QueryPool queryPool, uint32_t firstQuery, uint32_t queryCount, gsl::span<T> & data, DeviceSize stride, QueryResultFlags flags ) const
     {
       Result result = static_cast<Result>( vkGetQueryPoolResults( m_device, static_cast<VkQueryPool>( queryPool ), firstQuery, queryCount, static_cast<size_t>( data.size() * sizeof( T ) ), reinterpret_cast<void*>( data.data() ), stride, static_cast<VkQueryResultFlags>( flags ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eNotReady ) )
@@ -20794,8 +20795,8 @@ namespace vk
       {
         throw std::system_error( result, "vk::Device::getPipelineCacheData" );
       }
-      data.resize( dataSize );
-      result = static_cast<Result>( vkGetPipelineCacheData( m_device, static_cast<VkPipelineCache>( pipelineCache ), &dataSize, reinterpret_cast<void*>( data.data() ) ) );
+      std::vector<std::uint8_t> ret(dataSize);
+      result = static_cast<Result>( vkGetPipelineCacheData( m_device, static_cast<VkPipelineCache>( pipelineCache ), &dataSize, reinterpret_cast<void*>( ret.data() ) ) );
       if ( result != Result::eSuccess )
       {
         throw std::system_error( result, "vk::Device::getPipelineCacheData" );
@@ -20810,7 +20811,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void mergePipelineCaches( PipelineCache dstCache, std::vector<PipelineCache> const & srcCaches ) const
+    void mergePipelineCaches( PipelineCache dstCache, gsl::span<PipelineCache const> const & srcCaches ) const
     {
       Result result = static_cast<Result>( vkMergePipelineCaches( m_device, static_cast<VkPipelineCache>( dstCache ), static_cast<uint32_t>( srcCaches.size() ), reinterpret_cast<const VkPipelineCache*>( srcCaches.data() ) ) );
       if ( result != Result::eSuccess )
@@ -20826,7 +20827,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    std::vector<Pipeline> createGraphicsPipelines( PipelineCache pipelineCache, std::vector<GraphicsPipelineCreateInfo> const & createInfos, vk::Optional<const AllocationCallbacks> const & allocator ) const
+    std::vector<Pipeline> createGraphicsPipelines( PipelineCache pipelineCache, gsl::span<GraphicsPipelineCreateInfo const> const & createInfos, vk::Optional<const AllocationCallbacks> const & allocator ) const
     {
       std::vector<Pipeline> pipelines( createInfos.size() );
       Result result = static_cast<Result>( vkCreateGraphicsPipelines( m_device, static_cast<VkPipelineCache>( pipelineCache ), static_cast<uint32_t>( createInfos.size() ), reinterpret_cast<const VkGraphicsPipelineCreateInfo*>( createInfos.data() ), reinterpret_cast<const VkAllocationCallbacks*>( static_cast<const AllocationCallbacks*>( allocator)), reinterpret_cast<VkPipeline*>( pipelines.data() ) ) );
@@ -20844,7 +20845,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    std::vector<Pipeline> createComputePipelines( PipelineCache pipelineCache, std::vector<ComputePipelineCreateInfo> const & createInfos, vk::Optional<const AllocationCallbacks> const & allocator ) const
+    std::vector<Pipeline> createComputePipelines( PipelineCache pipelineCache, gsl::span<ComputePipelineCreateInfo const> const & createInfos, vk::Optional<const AllocationCallbacks> const & allocator ) const
     {
       std::vector<Pipeline> pipelines( createInfos.size() );
       Result result = static_cast<Result>( vkCreateComputePipelines( m_device, static_cast<VkPipelineCache>( pipelineCache ), static_cast<uint32_t>( createInfos.size() ), reinterpret_cast<const VkComputePipelineCreateInfo*>( createInfos.data() ), reinterpret_cast<const VkAllocationCallbacks*>( static_cast<const AllocationCallbacks*>( allocator)), reinterpret_cast<VkPipeline*>( pipelines.data() ) ) );
@@ -21030,7 +21031,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void freeDescriptorSets( DescriptorPool descriptorPool, std::vector<DescriptorSet> const & descriptorSets ) const
+    void freeDescriptorSets( DescriptorPool descriptorPool, gsl::span<DescriptorSet const> const & descriptorSets ) const
     {
       Result result = static_cast<Result>( vkFreeDescriptorSets( m_device, static_cast<VkDescriptorPool>( descriptorPool ), static_cast<uint32_t>( descriptorSets.size() ), reinterpret_cast<const VkDescriptorSet*>( descriptorSets.data() ) ) );
       if ( result != Result::eSuccess )
@@ -21046,7 +21047,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void updateDescriptorSets( std::vector<WriteDescriptorSet> const & descriptorWrites, std::vector<CopyDescriptorSet> const & descriptorCopies ) const
+    void updateDescriptorSets( gsl::span<WriteDescriptorSet const> const & descriptorWrites, gsl::span<CopyDescriptorSet const> const & descriptorCopies ) const
     {
       vkUpdateDescriptorSets( m_device, static_cast<uint32_t>( descriptorWrites.size() ), reinterpret_cast<const VkWriteDescriptorSet*>( descriptorWrites.data() ), static_cast<uint32_t>( descriptorCopies.size() ), reinterpret_cast<const VkCopyDescriptorSet*>( descriptorCopies.data() ) );
     }
@@ -21198,7 +21199,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void freeCommandBuffers( CommandPool commandPool, std::vector<CommandBuffer> const & commandBuffers ) const
+    void freeCommandBuffers( CommandPool commandPool, gsl::span<CommandBuffer const> const & commandBuffers ) const
     {
       vkFreeCommandBuffers( m_device, static_cast<VkCommandPool>( commandPool ), static_cast<uint32_t>( commandBuffers.size() ), reinterpret_cast<const VkCommandBuffer*>( commandBuffers.data() ) );
     }
@@ -21210,7 +21211,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    std::vector<SwapchainKHR> createSharedSwapchainsKHR( std::vector<SwapchainCreateInfoKHR> const & createInfos, vk::Optional<const AllocationCallbacks> const & allocator ) const
+    std::vector<SwapchainKHR> createSharedSwapchainsKHR( gsl::span<SwapchainCreateInfoKHR const> const & createInfos, vk::Optional<const AllocationCallbacks> const & allocator ) const
     {
       std::vector<SwapchainKHR> swapchains( createInfos.size() );
       Result result = static_cast<Result>( vkCreateSharedSwapchainsKHR( m_device, static_cast<uint32_t>( createInfos.size() ), reinterpret_cast<const VkSwapchainCreateInfoKHR*>( createInfos.data() ), reinterpret_cast<const VkAllocationCallbacks*>( static_cast<const AllocationCallbacks*>( allocator)), reinterpret_cast<VkSwapchainKHR*>( swapchains.data() ) ) );
@@ -21258,7 +21259,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result getSwapchainImagesKHR( SwapchainKHR swapchain, std::vector<Image> & swapchainImages ) const
+    std::vector<Image> getSwapchainImagesKHR( SwapchainKHR swapchain ) const
     {
       uint32_t swapchainImageCount;
       Result result = static_cast<Result>( vkGetSwapchainImagesKHR( m_device, static_cast<VkSwapchainKHR>( swapchain ), &swapchainImageCount, nullptr ) );
@@ -21266,13 +21267,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::Device::getSwapchainImagesKHR" );
       }
-      swapchainImages.resize( swapchainImageCount );
-      result = static_cast<Result>( vkGetSwapchainImagesKHR( m_device, static_cast<VkSwapchainKHR>( swapchain ), &swapchainImageCount, reinterpret_cast<VkImage*>( swapchainImages.data() ) ) );
+      std::vector<Image> ret(swapchainImageCount);
+      result = static_cast<Result>( vkGetSwapchainImagesKHR( m_device, static_cast<VkSwapchainKHR>( swapchain ), &swapchainImageCount, reinterpret_cast<VkImage*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::Device::getSwapchainImagesKHR" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21360,8 +21361,8 @@ namespace vk
       std::vector<QueueFamilyProperties> queueFamilyProperties;
       uint32_t queueFamilyPropertyCount;
       vkGetPhysicalDeviceQueueFamilyProperties( m_physicalDevice, &queueFamilyPropertyCount, nullptr );
-      queueFamilyProperties.resize( queueFamilyPropertyCount );
-      vkGetPhysicalDeviceQueueFamilyProperties( m_physicalDevice, &queueFamilyPropertyCount, reinterpret_cast<VkQueueFamilyProperties*>( queueFamilyProperties.data() ) );
+      std::vector<QueueFamilyProperties> ret(queueFamilyPropertyCount);
+      vkGetPhysicalDeviceQueueFamilyProperties( m_physicalDevice, &queueFamilyPropertyCount, reinterpret_cast<VkQueueFamilyProperties*>( ret.data() ) );
       return queueFamilyProperties;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
@@ -21450,7 +21451,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result enumerateDeviceLayerProperties( std::vector<LayerProperties> & properties ) const
+    std::vector<LayerProperties> enumerateDeviceLayerProperties(  ) const
     {
       uint32_t propertyCount;
       Result result = static_cast<Result>( vkEnumerateDeviceLayerProperties( m_physicalDevice, &propertyCount, nullptr ) );
@@ -21458,13 +21459,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::PhysicalDevice::enumerateDeviceLayerProperties" );
       }
-      properties.resize( propertyCount );
-      result = static_cast<Result>( vkEnumerateDeviceLayerProperties( m_physicalDevice, &propertyCount, reinterpret_cast<VkLayerProperties*>( properties.data() ) ) );
+      std::vector<LayerProperties> ret(propertyCount);
+      result = static_cast<Result>( vkEnumerateDeviceLayerProperties( m_physicalDevice, &propertyCount, reinterpret_cast<VkLayerProperties*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::enumerateDeviceLayerProperties" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21474,21 +21475,21 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result enumerateDeviceExtensionProperties( vk::Optional<std::string const> const & layerName, std::vector<ExtensionProperties> & properties ) const
+    std::vector<ExtensionProperties> enumerateDeviceExtensionProperties( vk::Optional<gsl::czstring<> const> const & layerName ) const
     {
       uint32_t propertyCount;
-      Result result = static_cast<Result>( vkEnumerateDeviceExtensionProperties( m_physicalDevice, layerName ? layerName->c_str() : nullptr, &propertyCount, nullptr ) );
+      Result result = static_cast<Result>( vkEnumerateDeviceExtensionProperties( m_physicalDevice, layerName ? *layerName : nullptr, &propertyCount, nullptr ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::enumerateDeviceExtensionProperties" );
       }
-      properties.resize( propertyCount );
-      result = static_cast<Result>( vkEnumerateDeviceExtensionProperties( m_physicalDevice, layerName ? layerName->c_str() : nullptr, &propertyCount, reinterpret_cast<VkExtensionProperties*>( properties.data() ) ) );
+      std::vector<ExtensionProperties> ret(propertyCount);
+      result = static_cast<Result>( vkEnumerateDeviceExtensionProperties( m_physicalDevice, layerName ? *layerName : nullptr, &propertyCount, reinterpret_cast<VkExtensionProperties*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::enumerateDeviceExtensionProperties" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21503,8 +21504,8 @@ namespace vk
       std::vector<SparseImageFormatProperties> properties;
       uint32_t propertyCount;
       vkGetPhysicalDeviceSparseImageFormatProperties( m_physicalDevice, static_cast<VkFormat>( format ), static_cast<VkImageType>( type ), static_cast<VkSampleCountFlagBits>( samples ), static_cast<VkImageUsageFlags>( usage ), static_cast<VkImageTiling>( tiling ), &propertyCount, nullptr );
-      properties.resize( propertyCount );
-      vkGetPhysicalDeviceSparseImageFormatProperties( m_physicalDevice, static_cast<VkFormat>( format ), static_cast<VkImageType>( type ), static_cast<VkSampleCountFlagBits>( samples ), static_cast<VkImageUsageFlags>( usage ), static_cast<VkImageTiling>( tiling ), &propertyCount, reinterpret_cast<VkSparseImageFormatProperties*>( properties.data() ) );
+      std::vector<SparseImageFormatProperties> ret(propertyCount);
+      vkGetPhysicalDeviceSparseImageFormatProperties( m_physicalDevice, static_cast<VkFormat>( format ), static_cast<VkImageType>( type ), static_cast<VkSampleCountFlagBits>( samples ), static_cast<VkImageUsageFlags>( usage ), static_cast<VkImageTiling>( tiling ), &propertyCount, reinterpret_cast<VkSparseImageFormatProperties*>( ret.data() ) );
       return properties;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
@@ -21515,7 +21516,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result getDisplayPropertiesKHR( std::vector<DisplayPropertiesKHR> & properties ) const
+    std::vector<DisplayPropertiesKHR> getDisplayPropertiesKHR(  ) const
     {
       uint32_t propertyCount;
       Result result = static_cast<Result>( vkGetPhysicalDeviceDisplayPropertiesKHR( m_physicalDevice, &propertyCount, nullptr ) );
@@ -21523,13 +21524,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayPropertiesKHR" );
       }
-      properties.resize( propertyCount );
-      result = static_cast<Result>( vkGetPhysicalDeviceDisplayPropertiesKHR( m_physicalDevice, &propertyCount, reinterpret_cast<VkDisplayPropertiesKHR*>( properties.data() ) ) );
+      std::vector<DisplayPropertiesKHR> ret(propertyCount);
+      result = static_cast<Result>( vkGetPhysicalDeviceDisplayPropertiesKHR( m_physicalDevice, &propertyCount, reinterpret_cast<VkDisplayPropertiesKHR*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayPropertiesKHR" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21539,7 +21540,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result getDisplayPlanePropertiesKHR( std::vector<DisplayPlanePropertiesKHR> & properties ) const
+    std::vector<DisplayPlanePropertiesKHR> getDisplayPlanePropertiesKHR(  ) const
     {
       uint32_t propertyCount;
       Result result = static_cast<Result>( vkGetPhysicalDeviceDisplayPlanePropertiesKHR( m_physicalDevice, &propertyCount, nullptr ) );
@@ -21547,13 +21548,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayPlanePropertiesKHR" );
       }
-      properties.resize( propertyCount );
-      result = static_cast<Result>( vkGetPhysicalDeviceDisplayPlanePropertiesKHR( m_physicalDevice, &propertyCount, reinterpret_cast<VkDisplayPlanePropertiesKHR*>( properties.data() ) ) );
+      std::vector<DisplayPlanePropertiesKHR> ret(propertyCount);
+      result = static_cast<Result>( vkGetPhysicalDeviceDisplayPlanePropertiesKHR( m_physicalDevice, &propertyCount, reinterpret_cast<VkDisplayPlanePropertiesKHR*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayPlanePropertiesKHR" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21563,7 +21564,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result getDisplayPlaneSupportedDisplaysKHR( uint32_t planeIndex, std::vector<DisplayKHR> & displays ) const
+    std::vector<DisplayKHR> getDisplayPlaneSupportedDisplaysKHR( uint32_t planeIndex ) const
     {
       uint32_t displayCount;
       Result result = static_cast<Result>( vkGetDisplayPlaneSupportedDisplaysKHR( m_physicalDevice, planeIndex, &displayCount, nullptr ) );
@@ -21571,13 +21572,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayPlaneSupportedDisplaysKHR" );
       }
-      displays.resize( displayCount );
-      result = static_cast<Result>( vkGetDisplayPlaneSupportedDisplaysKHR( m_physicalDevice, planeIndex, &displayCount, reinterpret_cast<VkDisplayKHR*>( displays.data() ) ) );
+      std::vector<DisplayKHR> ret(displayCount);
+      result = static_cast<Result>( vkGetDisplayPlaneSupportedDisplaysKHR( m_physicalDevice, planeIndex, &displayCount, reinterpret_cast<VkDisplayKHR*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayPlaneSupportedDisplaysKHR" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21587,7 +21588,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result getDisplayModePropertiesKHR( DisplayKHR display, std::vector<DisplayModePropertiesKHR> & properties ) const
+    std::vector<DisplayModePropertiesKHR> getDisplayModePropertiesKHR( DisplayKHR display ) const
     {
       uint32_t propertyCount;
       Result result = static_cast<Result>( vkGetDisplayModePropertiesKHR( m_physicalDevice, static_cast<VkDisplayKHR>( display ), &propertyCount, nullptr ) );
@@ -21595,13 +21596,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayModePropertiesKHR" );
       }
-      properties.resize( propertyCount );
-      result = static_cast<Result>( vkGetDisplayModePropertiesKHR( m_physicalDevice, static_cast<VkDisplayKHR>( display ), &propertyCount, reinterpret_cast<VkDisplayModePropertiesKHR*>( properties.data() ) ) );
+      std::vector<DisplayModePropertiesKHR> ret(propertyCount);
+      result = static_cast<Result>( vkGetDisplayModePropertiesKHR( m_physicalDevice, static_cast<VkDisplayKHR>( display ), &propertyCount, reinterpret_cast<VkDisplayModePropertiesKHR*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::getDisplayModePropertiesKHR" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21698,7 +21699,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result getSurfaceFormatsKHR( SurfaceKHR surface, std::vector<SurfaceFormatKHR> & surfaceFormats ) const
+    std::vector<SurfaceFormatKHR> getSurfaceFormatsKHR( SurfaceKHR surface ) const
     {
       uint32_t surfaceFormatCount;
       Result result = static_cast<Result>( vkGetPhysicalDeviceSurfaceFormatsKHR( m_physicalDevice, static_cast<VkSurfaceKHR>( surface ), &surfaceFormatCount, nullptr ) );
@@ -21706,13 +21707,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::PhysicalDevice::getSurfaceFormatsKHR" );
       }
-      surfaceFormats.resize( surfaceFormatCount );
-      result = static_cast<Result>( vkGetPhysicalDeviceSurfaceFormatsKHR( m_physicalDevice, static_cast<VkSurfaceKHR>( surface ), &surfaceFormatCount, reinterpret_cast<VkSurfaceFormatKHR*>( surfaceFormats.data() ) ) );
+      std::vector<SurfaceFormatKHR> ret(surfaceFormatCount);
+      result = static_cast<Result>( vkGetPhysicalDeviceSurfaceFormatsKHR( m_physicalDevice, static_cast<VkSurfaceKHR>( surface ), &surfaceFormatCount, reinterpret_cast<VkSurfaceFormatKHR*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::getSurfaceFormatsKHR" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -21722,7 +21723,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result getSurfacePresentModesKHR( SurfaceKHR surface, std::vector<PresentModeKHR> & presentModes ) const
+    std::vector<PresentModeKHR> getSurfacePresentModesKHR( SurfaceKHR surface ) const
     {
       uint32_t presentModeCount;
       Result result = static_cast<Result>( vkGetPhysicalDeviceSurfacePresentModesKHR( m_physicalDevice, static_cast<VkSurfaceKHR>( surface ), &presentModeCount, nullptr ) );
@@ -21730,13 +21731,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::PhysicalDevice::getSurfacePresentModesKHR" );
       }
-      presentModes.resize( presentModeCount );
-      result = static_cast<Result>( vkGetPhysicalDeviceSurfacePresentModesKHR( m_physicalDevice, static_cast<VkSurfaceKHR>( surface ), &presentModeCount, reinterpret_cast<VkPresentModeKHR*>( presentModes.data() ) ) );
+      std::vector<PresentModeKHR> ret(presentModeCount);
+      result = static_cast<Result>( vkGetPhysicalDeviceSurfacePresentModesKHR( m_physicalDevice, static_cast<VkSurfaceKHR>( surface ), &presentModeCount, reinterpret_cast<VkPresentModeKHR*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::PhysicalDevice::getSurfacePresentModesKHR" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -22028,7 +22029,7 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    Result enumeratePhysicalDevices( std::vector<PhysicalDevice> & physicalDevices ) const
+    std::vector<PhysicalDevice> enumeratePhysicalDevices(  ) const
     {
       uint32_t physicalDeviceCount;
       Result result = static_cast<Result>( vkEnumeratePhysicalDevices( m_instance, &physicalDeviceCount, nullptr ) );
@@ -22036,13 +22037,13 @@ namespace vk
       {
         throw std::system_error( result, "vk::Instance::enumeratePhysicalDevices" );
       }
-      physicalDevices.resize( physicalDeviceCount );
-      result = static_cast<Result>( vkEnumeratePhysicalDevices( m_instance, &physicalDeviceCount, reinterpret_cast<VkPhysicalDevice*>( physicalDevices.data() ) ) );
+      std::vector<PhysicalDevice> ret(physicalDeviceCount);
+      result = static_cast<Result>( vkEnumeratePhysicalDevices( m_instance, &physicalDeviceCount, reinterpret_cast<VkPhysicalDevice*>( ret.data() ) ) );
       if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
       {
         throw std::system_error( result, "vk::Instance::enumeratePhysicalDevices" );
       }
-      return result;
+      return ret;
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -22052,9 +22053,9 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    PFN_vkVoidFunction getProcAddr( std::string const & name ) const
+    PFN_vkVoidFunction getProcAddr( gsl::czstring<> const & name ) const
     {
-      return vkGetInstanceProcAddr( m_instance, name.c_str() );
+      return vkGetInstanceProcAddr( m_instance, name );
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -22256,9 +22257,9 @@ namespace vk
     }
 
 #ifdef VKCPP_ENHANCED_MODE
-    void debugReportMessageEXT( DebugReportFlagsEXT flags, DebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, std::string const & layerPrefix, std::string const & message ) const
+    void debugReportMessageEXT( DebugReportFlagsEXT flags, DebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, gsl::czstring<> const & layerPrefix, gsl::czstring<> const & message ) const
     {
-      vkDebugReportMessageEXT( m_instance, static_cast<VkDebugReportFlagsEXT>( flags ), static_cast<VkDebugReportObjectTypeEXT>( objectType ), object, location, messageCode, layerPrefix.c_str(), message.c_str() );
+      vkDebugReportMessageEXT( m_instance, static_cast<VkDebugReportFlagsEXT>( flags ), static_cast<VkDebugReportObjectTypeEXT>( objectType ), object, location, messageCode, layerPrefix, message );
     }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -22315,7 +22316,7 @@ namespace vk
   }
 
 #ifdef VKCPP_ENHANCED_MODE
-  inline Result enumerateInstanceLayerProperties( std::vector<LayerProperties> & properties )
+  inline std::vector<LayerProperties> enumerateInstanceLayerProperties(  )
   {
     uint32_t propertyCount;
     Result result = static_cast<Result>( vkEnumerateInstanceLayerProperties( &propertyCount, nullptr ) );
@@ -22323,13 +22324,13 @@ namespace vk
     {
       throw std::system_error( result, "vk::enumerateInstanceLayerProperties" );
     }
-    properties.resize( propertyCount );
-    result = static_cast<Result>( vkEnumerateInstanceLayerProperties( &propertyCount, reinterpret_cast<VkLayerProperties*>( properties.data() ) ) );
+    std::vector<LayerProperties> ret(propertyCount);
+    result = static_cast<Result>( vkEnumerateInstanceLayerProperties( &propertyCount, reinterpret_cast<VkLayerProperties*>( ret.data() ) ) );
     if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
     {
       throw std::system_error( result, "vk::enumerateInstanceLayerProperties" );
     }
-    return result;
+    return ret;
   }
 #endif /*VKCPP_ENHANCED_MODE*/
 
@@ -22339,21 +22340,21 @@ namespace vk
   }
 
 #ifdef VKCPP_ENHANCED_MODE
-  inline Result enumerateInstanceExtensionProperties( vk::Optional<std::string const> const & layerName, std::vector<ExtensionProperties> & properties )
+  inline std::vector<ExtensionProperties> enumerateInstanceExtensionProperties( vk::Optional<gsl::czstring<> const> const & layerName )
   {
     uint32_t propertyCount;
-    Result result = static_cast<Result>( vkEnumerateInstanceExtensionProperties( layerName ? layerName->c_str() : nullptr, &propertyCount, nullptr ) );
+    Result result = static_cast<Result>( vkEnumerateInstanceExtensionProperties( layerName ? *layerName : nullptr, &propertyCount, nullptr ) );
     if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
     {
       throw std::system_error( result, "vk::enumerateInstanceExtensionProperties" );
     }
-    properties.resize( propertyCount );
-    result = static_cast<Result>( vkEnumerateInstanceExtensionProperties( layerName ? layerName->c_str() : nullptr, &propertyCount, reinterpret_cast<VkExtensionProperties*>( properties.data() ) ) );
+    std::vector<ExtensionProperties> ret(propertyCount);
+    result = static_cast<Result>( vkEnumerateInstanceExtensionProperties( layerName ? *layerName : nullptr, &propertyCount, reinterpret_cast<VkExtensionProperties*>( ret.data() ) ) );
     if ( ( result != Result::eSuccess ) && ( result != Result::eIncomplete ) )
     {
       throw std::system_error( result, "vk::enumerateInstanceExtensionProperties" );
     }
-    return result;
+    return ret;
   }
 #endif /*VKCPP_ENHANCED_MODE*/
 
