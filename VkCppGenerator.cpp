@@ -536,6 +536,10 @@ std::string determineReturnType(CommandData const& commandData, size_t returnInd
     // an original return of type "Result" with less just one successCode is changed to void, errors throw an exception
     returnType = "void";
   }
+  else if (commandData.twoStep)
+  {
+	  returnType = "std::vector<" + commandData.arguments[returnIndex].pureType + ">";
+  }
   else
   {
     // the return type just stays the original return type
@@ -1600,7 +1604,17 @@ void writeCall(std::ofstream & ofs, std::string const& name, size_t templateInde
             {
               ofs << "Vk";
             }
-            ofs << commandData.arguments[it->first].pureType << "*>( " << reduceName(commandData.arguments[it->first].name) << ".data() )";
+			ofs << commandData.arguments[it->first].pureType << "*>( ";
+			// In a two step command, we use a local dynamic buffer instead of the passed-in argument
+			if (commandData.twoStep)
+			{
+				ofs << "ret";
+			}
+			else
+			{
+				ofs << reduceName(commandData.arguments[it->first].name);
+			}
+			ofs << ".data() )";
           }
           else if (commandData.arguments[it->first].pureType == "char")
           {
@@ -1775,7 +1789,6 @@ void writeFunctionBody(std::ofstream & ofs, std::string const& indentation, std:
 
     std::map<size_t, size_t>::const_iterator returnit = vectorParameters.find(returnIndex);
     assert(returnit != vectorParameters.end() && (returnit->second != ~0));
-    assert((commandData.returnType == "Result") || (commandData.returnType == "void"));
 
     ofs << indentation << "  " << commandData.arguments[returnit->second].pureType << " " << reduceName(commandData.arguments[returnit->second].name) << ";" << std::endl;
   }
@@ -1808,7 +1821,9 @@ void writeFunctionBody(std::ofstream & ofs, std::string const& indentation, std:
     std::map<size_t, size_t>::const_iterator returnit = vectorParameters.find(returnIndex);
 
     // resize the vector to hold the data according to the result from the first call
-    ofs << indentation << "  " << reduceName(commandData.arguments[returnit->first].name) << ".resize( " << reduceName(commandData.arguments[returnit->second].name) << " );" << std::endl;
+	using namespace std::string_literals;
+	auto const pureType = commandData.arguments[returnit->first].pureType == "void"s ? "std::uint8_t"s : commandData.arguments[returnit->first].pureType;
+    ofs << indentation << "  std::vector<" << pureType << "> ret(" << reduceName(commandData.arguments[returnit->second].name) << ");" << std::endl;
 
     // write the function call a second time
     ofs << indentation << "  ";
@@ -1839,6 +1854,10 @@ void writeFunctionBody(std::ofstream & ofs, std::string const& indentation, std:
   {
     ofs << indentation << "  return result;" << std::endl;
   }
+  else if (commandData.twoStep)
+  {
+	  ofs << indentation << "  return ret;" << std::endl;
+  }
 
   ofs << indentation << "}" << std::endl;
 }
@@ -1849,6 +1868,13 @@ void writeFunctionHeader(std::ofstream & ofs, std::string const& indentation, st
   for (std::map<size_t, size_t>::const_iterator it = vectorParameters.begin(); it != vectorParameters.end(); ++it)
   {
     skippedArguments.insert(it->second);
+
+	// In two step calls, ignore the array argument too, 
+	// since tne data will be returned from a local buffer instead
+	if (commandData.twoStep && it->first == returnIndex)
+	{
+		skippedArguments.insert(it->first);
+	}
   }
   if ((vectorParameters.size() == 1)
       && ((commandData.arguments[vectorParameters.begin()->first].len == "dataSize/4") || (commandData.arguments[vectorParameters.begin()->first].len == "latexmath:[$dataSize \\over 4$]")))
