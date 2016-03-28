@@ -1,0 +1,16 @@
+VkCppGenerator.dir/
+.vs/
+Debug/
+CMakeFiles/
+x64/
+ALL_BUILD.vcxproj
+ALL_BUILD.vcxproj.filters
+CMakeCache.txt
+Release/
+VkCppGenerator.sdf
+VkCppGenerator.sln
+VkCppGenerator.vcxproj
+VkCppGenerator.vcxproj.filters
+ZERO_CHECK.vcxproj
+ZERO_CHECK.vcxproj.filters
+cmake_install.cmake
