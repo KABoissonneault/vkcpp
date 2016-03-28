@@ -1741,41 +1741,43 @@ void writeFunctionBody(std::ofstream & ofs, std::string const& indentation, std:
   }
 
   // write the local variable to hold a returned value
-  if ((returnIndex != ~0) && (((commandData.returnType == "Result") && (commandData.successCodes.size() < 2)) || (commandData.returnType == "void")))
+  if (!commandData.twoStep)
   {
-    ofs << indentation << "  " << returnType << " " << reduceName(commandData.arguments[returnIndex].name);
+	  if ((returnIndex != ~0) && (((commandData.returnType == "Result") && (commandData.successCodes.size() < 2)) || (commandData.returnType == "void")))
+	  {
+		  ofs << indentation << "  " << returnType << " " << reduceName(commandData.arguments[returnIndex].name);
 
-    std::map<size_t, size_t>::const_iterator it = vectorParameters.find(returnIndex);
-    if (it != vectorParameters.end() && !commandData.twoStep)
-    {
-      std::string size;
-      if ((it->second == ~0) && !commandData.arguments[returnIndex].len.empty())
-      {
-        size = reduceName(commandData.arguments[returnIndex].len);
-        size_t pos = size.find("->");
-        assert(pos != std::string::npos);
-        size.replace(pos, 2, ".");
-        size += "()";
-      }
-      else
-      {
-        for (std::map<size_t, size_t>::const_iterator sit = vectorParameters.begin(); sit != vectorParameters.end(); ++sit)
-        {
-          if ((sit->first != returnIndex) && (sit->second == it->second))
-          {
-            size = reduceName(commandData.arguments[sit->first].name) + ".size()";
-            break;
-          }
-        }
-      }
-      assert(!size.empty());
-      ofs << "( " << size << " )";
-    }
-    ofs << ";" << std::endl;
+		  std::map<size_t, size_t>::const_iterator it = vectorParameters.find(returnIndex);
+		  if (it != vectorParameters.end())
+		  {
+			  std::string size;
+			  if ((it->second == ~0) && !commandData.arguments[returnIndex].len.empty())
+			  {
+				  size = reduceName(commandData.arguments[returnIndex].len);
+				  size_t pos = size.find("->");
+				  assert(pos != std::string::npos);
+				  size.replace(pos, 2, ".");
+				  size += "()";
+			  }
+			  else
+			  {
+				  for (std::map<size_t, size_t>::const_iterator sit = vectorParameters.begin(); sit != vectorParameters.end(); ++sit)
+				  {
+					  if ((sit->first != returnIndex) && (sit->second == it->second))
+					  {
+						  size = reduceName(commandData.arguments[sit->first].name) + ".size()";
+						  break;
+					  }
+				  }
+			  }
+			  assert(!size.empty());
+			  ofs << "( " << size << " )";
+		  }
+		  ofs << ";" << std::endl;
+	  }
   }
-
   // local count variable to hold the size of the vector to fill
-  if (commandData.twoStep)
+  else
   {
     assert(returnIndex != ~0);
 
@@ -1835,10 +1837,20 @@ void writeFunctionBody(std::ofstream & ofs, std::string const& indentation, std:
     {
       writeExceptionCheck(ofs, indentation, className, functionName, commandData.successCodes);
     }
+
+	// Add the out Result if not null
+	if (commandData.successCodes.size() > 1)
+	{
+		ofs << indentation << "  if( out_Result != nullptr ) *out_Result = result;" << std::endl;	
+	}
   }
 
   // return the returned value
-  if ((returnIndex != ~0) && (((commandData.returnType == "Result") && (commandData.successCodes.size() < 2)) || (commandData.returnType == "void")))
+  if (commandData.twoStep)
+  {
+	  ofs << indentation << "  return ret;" << std::endl;
+  }
+  else if ((returnIndex != ~0) && (((commandData.returnType == "Result") && (commandData.successCodes.size() < 2) ) || (commandData.returnType == "void")))
   {
     ofs << indentation << "  return " << reduceName(commandData.arguments[returnIndex].name) << ";" << std::endl;
   }
@@ -1846,11 +1858,7 @@ void writeFunctionBody(std::ofstream & ofs, std::string const& indentation, std:
   {
     ofs << indentation << "  return result;" << std::endl;
   }
-  else if (commandData.twoStep)
-  {
-	  ofs << indentation << "  return ret;" << std::endl;
-  }
-
+ 
   ofs << indentation << "}" << std::endl;
 }
 
@@ -1984,6 +1992,15 @@ void writeFunctionHeader(std::ofstream & ofs, std::string const& indentation, st
       }
       argEncountered = true;
     }
+  }
+  // Add the ability for the user to get the exact result in two step functions with multiple success codes
+  if (commandData.successCodes.size() > 1 && commandData.twoStep)
+  {
+	  if (argEncountered)
+	  {
+		  ofs << ", ";
+	  }
+	  ofs << "vk::Optional<Result> out_Result = nullptr";
   }
   ofs << " )";
   if (commandData.handleCommand)
