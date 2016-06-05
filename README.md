@@ -1,5 +1,7 @@
 # Open-Source Vulkan C++ API
 
+Note: This fork exposes an additional dependency on GSL for gsl::span in Enhanced mode. This will likely change to std::
+
 Vulkan is a C API and as such inherits all common pitfalls of using a general C programming library. The motivation of a low-level Vulkan C++ API is to avoid these common pitfalls by applying commonly known C++ features while keeping the overall structure of a Vulkan program and preserving the full freedom it provides as low-level graphics API. An additional guideline we followed was not to introduce additional runtime overhead by providing a header-only library with inline functions.
 
 Have a look at the following piece of code which creates a VkImage:
@@ -137,8 +139,7 @@ device.createImage(&ci, allocator, &image);
 To provide a more object oriented feeling we're providing classes for each handle which include all Vulkan functions where the first 
 parameter matches the handle. In addition to this we made a few changes to the signatures of the member functions
 * To enable the enhanced mode put ```#define VKCPP_ENHANCED_MODE``` before including ```vk_cpp.h```
-* ```(count, T*)``` has been replaced by ```std::vector<T>```
-* ```const char *``` has been replaced by ```std::string ```
+* ```(count, T*)``` has been replaced by ```gsl::span<T>``` or ```std::vector<T>``` 
 * ```T const*``` has been replaced by ```T const &``` to allow temporary objects. This is useful to pass small structures like ```vk::ClearColorValue``` or ```vk::Extent*```
 ```commandBuffer.clearColorImage(image, layout, std::array<float, 4>{1.0f, 1.0f, 1.0f, 1.0f}, {...});```
 Optional parameters are being replaced by ```Optional<T> const &``` which accept a type of ```T const&```. ```nullptr``` can be used to initialize an empty ```Optional<T>```.
