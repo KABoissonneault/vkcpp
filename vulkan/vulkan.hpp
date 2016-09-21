@@ -54,7 +54,7 @@ static_assert( VK_HEADER_VERSION ==  21 , "Wrong VK_HEADER_VERSION!" );
 #   define VULKAN_HPP_HAS_UNRESTRICTED_UNIONS
 #  endif
 # elif defined(__GNUC__)
-#  define GCC_VERSION (__GNUC__ * 1000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#  define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #  if 40600 <= GCC_VERSION
 #   define VULKAN_HPP_HAS_UNRESTRICTED_UNIONS
 #  endif
