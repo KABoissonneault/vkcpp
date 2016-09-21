@@ -42,7 +42,6 @@ errors into compile errors. Following is a list of features and conventions intr
 * defines all symbols within the 'vk' namespace and to avoid redundancy the vk/Vk/VK_ prefixes have been removed from all symbols, i.e. ```vk::ImageCreateInfo``` for VkImageCreateInfo.
 * camel case syntax with an 'e' prefix has been introduced for all enums, i.e. ```vk::ImageType::e2D``` (the prefix was a compromise, more about that later) removes the 'BIT' suffix from all flag related enums, i.e. ```vk::ImageUsage::eColorAttachment```.
 * introduces constructors for all structs, which by default set the appropriate ```sType``` and all other values to zero.
-* encapsulates member variables of the structs with getter and setter functions, i.e. ```ci.imageType()``` to get a value and ```ci.imageType(vk::ImageType::e2D)``` to set a value.
 * introduces wrapper classes around the vulkan handles, i.e. ```vk::CommandBuffer``` for VkCommandBuffer
 * introduces member functions of those wrapper classes, that map to vulkan functions getting the corresponding vulkan handle as its first argument. The type of that handle is stripped from the function name, i.e. ```vk::Device::getProcAddr``` for vkGetDeviceProcAddr. Note the special handling for the class CommandBuffer, where most of the vulkan functions would just include "Cmd", instead of "CommandBuffer", i.e. ```vk::CommandBuffer::bindPipeline``` for vkCmdBindPipeline.
 With those changes applied, the updated code snippet looks like this:
@@ -50,19 +49,19 @@ With those changes applied, the updated code snippet looks like this:
 
 ```c++
 vk::ImageCreateInfo ci;
-ci.flags(...some flags...);
-ci.imageType(vk::ImageType::e2D);
-ci.format(vk::Format::eR8G8B8A8Unorm);
-ci.extent(vk::Extent3D { width, height, 1 });
-ci.mipLevels(1);
-ci.arrayLayers(1);
-ci.samples(1);
-ci.tiling(vk::ImageTiling::eOptimal);
-ci.usage(vk::ImageUsage::eColorAttachment);
-ci.sharingMode(vk::SharingMode::eExclusive);
-  // ci.queueFamilyIndexCount(0)	// no need to set, already initialized
-  // ci.pQueueFamilyIndices(0)	// no need to set, already initialized
-ci.initialLayout(vk::ImageLayout::eUndefined);
+ci.flags = ...some flags...;
+ci.imageType = vk::ImageType::e2D;
+ci.format = vk::Format::eR8G8B8A8Unorm;
+ci.extent = vk::Extent3D { width, height, 1 };
+ci.mipLevels = 1;
+ci.arrayLayers = 1;
+ci.samples = 1;
+ci.tiling = vk::ImageTiling::eOptimal;
+ci.usage = vk::ImageUsage::eColorAttachment;
+ci.sharingMode = vk::SharingMode::eExclusive;
+  // ci.queueFamilyIndexCount = 0	// no need to set, already initialized
+  // ci.pQueueFamilyIndices = 0	// no need to set, already initialized
+ci.initialLayout = vk::ImageLayout::eUndefined;
 device.createImage(&ci, allocator, &image);
 ```
 
@@ -115,42 +114,42 @@ we have implemented ```to_string(type)``` functions for all enums and flags. Cal
 
 Another nice feature of those constructors is that sType is being initialized internally and thus is always correct.
 
-Finally, we have added a default constructor to each struct which initializes all values to 0 to allow setting the values with the named parameter idiom which is similar to the designated initializer list of C99.
+Finally, we have added a default constructor to each struct which initializes all values to 0 to allow setting the values with a variant of the named parameter idiom which is similar to the designated initializer list of C99.
 
 ```c++
 vk::ImageCreateInfo ci = vk::ImageCreateInfo()
-  .flags(...some flags...)
-  .imageType(vk::ImageType::e2D)
-  .format(vk::Format::eR8G8B8A8Unorm)
-  .extent(vk::Extent3D { width, height, 1 })
-  .mipLevels(1)
-  .arrayLayers(1)
-  .samples(1)
-  .tiling(vk::ImageTiling::eOptimal)
-  .usage(vk::ImageUsage::eColorAttachment)
-  .sharingMode(vk::SharingMode::eExclusive)
-  // .queueFamilyIndexCount(0)	// no need to set, already initialized
-  // .pQueueFamilyIndices(0)	// no need to set, already initialized
-  .initialLayout(vk::ImageLayout::eUndefined);
+  .setFlags(...some flags...)
+  .setImageType(vk::ImageType::e2D)
+  .setFormat(vk::Format::eR8G8B8A8Unorm)
+  .setExtent(vk::Extent3D { width, height, 1 })
+  .setMipLevels(1)
+  .setArrayLayers(1)
+  .setSamples(1)
+  .setTiling(vk::ImageTiling::eOptimal)
+  .setUsage(vk::ImageUsage::eColorAttachment)
+  .setSharingMode(vk::SharingMode::eExclusive)
+  // .setQueueFamilyIndexCount(0)	// no need to set, already initialized
+  // .setPQueueFamilyIndices(0)	// no need to set, already initialized
+  .setInitialLayout(vk::ImageLayout::eUndefined);
 device.createImage(&ci, allocator, &image);
 ```
 
 # Enhancements beyond native Vulkan
 To provide a more object oriented feeling we're providing classes for each handle which include all Vulkan functions where the first 
 parameter matches the handle. In addition to this we made a few changes to the signatures of the member functions
-* To enable the enhanced mode put ```#define VKCPP_ENHANCED_MODE``` before including ```vk_cpp.h```
-* ```(count, T*)``` has been replaced by ```gsl::span<T>``` or ```std::vector<T>``` 
-* ```T const*``` has been replaced by ```T const &``` to allow temporary objects. This is useful to pass small structures like ```vk::ClearColorValue``` or ```vk::Extent*```
+* To disable the enhanced mode put ```#define VULKAN_HPP_DISABLE_ENHANCED_MODE``` before including ```vulkan.hpp```
+* ```(count, T*)``` has been replaced by ```vk::ArrayProxy<T>```, which can be created out of a single T, a (count, T*) pair, a std::array<T,N>, a vector<T>, or an initializer_list<T>.
+* ```const char *``` has been replaced by ```const std::string &```
+* ```const T *``` has been replaced by ```const T &``` to allow temporary objects. This is useful to pass small structures like ```vk::ClearColorValue``` or ```vk::Extent*```
 ```commandBuffer.clearColorImage(image, layout, std::array<float, 4>{1.0f, 1.0f, 1.0f, 1.0f}, {...});```
-Optional parameters are being replaced by ```Optional<T> const &``` which accept a type of ```T const&```. ```nullptr``` can be used to initialize an empty ```Optional<T>```.
-* The wrapper will throw a ```std::system_error``` if a ```vk::Result``` return value is not an success code. If there's only a single success code it's not returned at all. In this case functions with a single output value do return this output value instead.
+Optional parameters are being replaced by ```Optional<T>``` which accept a type of ```const T```, ```T```, or ```const std::string```. ```nullptr``` can be used to initialize an empty ```Optional<T>```.
 
 Here are a few code examples:
 ```c++
   try {
     VkInstance nativeInstance = nullptr; // Fetch the instance from a favorite toolkit
 
-    // create a vkcpp handle from a native handle
+    // create a vk::Instance handle from a native handle
     vk::Instance i(nativeInstance);
 
     // operator=(VkInstance const &) is also supported
@@ -173,36 +172,46 @@ Here are a few code examples:
     device.allocateMemory(allocateInfo, nullptr);
 
   }
-  catch (std::system_error e)
+  catch (const std::exception &e)
   {
     std::cerr << "Vulkan failure: " << e.what() << std::endl;
   }
 ```
-    
+# Exceptions and return types
+The wrapper functions will throw a ```std::system_error``` if the result of the wrapped function is not a success code.
+By defining ```VULKAN_HPP_NO_EXCEPTIONS``` before include vulkan.hpp, this can be disabled.
+Depending on exceptions being enabled or disabled, the return type of some functions change.
+
+With exceptions enabled (the default) there are four different cases on the return types:
+* Just one possible success code
+  * no output value -> return type is ```void```
+  * one output value -> return type is T, which is the type of the output value
+* Multiple possible success codes
+  * no output value -> return type is ```vk::Result```
+  * one output value -> return type is a structure ```vk::ResultValue<T>``` with a member ```result``` of type ```vk::Result``` holding the actual result code, and a member ```value``` of type T, which is the type of the output value, holding that output value.
+
+With exceptions disabled, the return type of those wrapper functions where the wrapped function has just one possible success code is different:
+* no output value -> return type is ```vk::Result```
+* one output value -> return type is ```vk::ResultValue<T>```, as described above.
+
+Note: With exceptions disabled, it is the user's responsibility to check for errors!    
+
 # Usage
 To start with the C++ version of the Vulkan API download header from GIT, put it in a vulkan subdirectory and add
-```#include <vulkan/vk_cpp.h>``` to your source code.
+```#include <vulkan/vulkan.hpp>``` to your source code.
 
 To build the header for a given vk.xml specification continue with the following steps:
 
-* Build VkCppGenerator
+* Build VulkanHppGenerator
 * Grab your favourite version vk.xml from Khronos
-* Excute ```VkCppGenerator <vk.xml>``` to generate ```vk_cpp.h``` in the current working directory.
+* Excute ```VulkanHppGenerator <vk.xml>``` to generate ```vulkan.hpp``` in the current working directory.
 
-# Build instructions for VkCppGenerator
+# Build instructions for VulkanHppGenerator
 
-* Clone the repository: ```git clone https://github.com/nvpro-pipeline/vkcpp.git```
+* Clone the repository: ```git clone https://github.com/KhronosGroup/vkcpp```
 * Update submodules: ```git submodule update --init --recursive```
 * Use CMake to generate a solution or makefile for your favourite build environment
 * Launch the build
 
-# Providing Pull Requests
-
-NVIDIA is happy to review and consider pull requests for merging into the main tree of vkcpp for bug fixes and features. Before providing a pull request to NVIDIA, please note the following:
-
-* A pull request provided to this repo by a developer constitutes permission from the developer for NVIDIA to merge the provided
-  changes or any NVIDIA modified version of these changes to the repo. NVIDIA may remove or change the code at any time and in any
-  way deemed appropriate. Due to the required paperwork please refrain from providing pull requests for simple changes and file an issue
-  describing a bug or the desired change instead.
-* Not all pull requests can be or will be accepted. NVIDIA will close pull requests that it does not intend to merge.
-* The modified files and any new files must include the unmodified NVIDIA copyright header seen at the top of all shipping files.
+# Samples
+Brad Davis started to port Sascha Willems Samples to vulkan.hpp. You can find his work in his [repository](https://github.com/jherico/Vulkan).
